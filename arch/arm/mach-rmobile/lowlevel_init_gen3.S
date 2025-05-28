@@ -65,11 +65,11 @@ ENTRY(lowlevel_init)
 	b.eq set_gic_base_v2l
 
 	cmp w11, #BOARD_ID_RZV2H_EVK
-	ldr x0, =GICD_BASE_V2H
+	ldr x0, =GICD_BASE_RZV2H
 	b continue_gic_init
 
 set_gic_base_v2l:
-	ldr x0, =GICD_BASE_V2L
+	ldr x0, =GICD_BASE_RZV2L
 
 continue_gic_init:
 
@@ -94,11 +94,11 @@ continue_gic_init:
 	cmp w11, #BOARD_ID_RZV2L_EVK
 	b.eq 2f
 
-	ldr x0, =GICR_BASE_V2H
+	ldr x0, =GICR_BASE_RZV2H
 	b 3f
 
 2:
-	ldr x0, =GICR_BASE_V2L
+	ldr x0, =GICR_BASE_RZV2L
 
 3:
 	bl 	gic_init_secure_percpu
@@ -155,11 +155,11 @@ ENTRY(smp_kick_all_cpus)
 	cmp w11, #BOARD_ID_RZV2L_EVK
 	b.eq 1f
 
-	ldr x0, =GICD_BASE_V2H
+	ldr x0, =GICD_BASE_RZV2H
 	b 2f
 
 1:
-	ldr x0, =GICD_BASE_V2L
+	ldr x0, =GICD_BASE_RZV2L
 
 2:
 	b	gic_kick_secondary_cpus

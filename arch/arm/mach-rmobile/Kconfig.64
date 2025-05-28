@@ -233,7 +233,7 @@ config TARGET_SMARC_RZG2UL
 config TARGET_RZ_CMN
 	bool "RZ common boards"
 	help
-          Support for Renesas RZPI, SMARC RZV2L, SMARC RZG2L and RZV2H
+          Support for Renesas RZG2L SBC, SMARC RZV2L, SMARC RZG2L and RZV2H
 endchoice
 
 config SYS_SOC

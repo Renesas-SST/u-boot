@@ -29,14 +29,13 @@
 #define CONFIG_INITRD_TAG
 
 /* Generic Interrupt Controller Definitions */
-/* RZ/V2H, V2L, G2L and RZPI use GIC-v3 */
+/* RZ/V2H, V2L, G2L and RZG2L-SBC use GIC-v3 */
 #define CONFIG_GICV3
 
-#define GICD_BASE_V2H	0x14900000
-#define GICR_BASE_V2H	0x14940000
-
-#define GICD_BASE_V2L	0x11900000
-#define GICR_BASE_V2L	0x11940000
+#define GICD_BASE_RZV2H		0x14900000
+#define GICR_BASE_RZV2H		0x14940000
+#define GICD_BASE_RZV2L		0x11900000
+#define GICR_BASE_RZV2L		0x11940000
 
 /* console */
 #define CONFIG_SYS_CBSIZE		2048

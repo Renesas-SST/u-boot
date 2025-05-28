@@ -53,50 +53,50 @@ DECLARE_GLOBAL_DATA_PTR;
 #define PWPR_REGWE_B		BIT(5)
 
 /* CPG */
-#define CPG_BASE			0x10420000
-#define CPG_SSEL0			(CPG_BASE + 0x0300)
-#define CPG_SSEL1			(CPG_BASE + 0x0304)
-#define CPG_CLKON_11		(CPG_BASE + 0x062C)
-#define CPG_CLKON_12		(CPG_BASE + 0x0630)
-#define CPG_CLKMON_5		(CPG_BASE + 0x0814)
-#define CPG_CLKMON_6		(CPG_BASE + 0x0818)
-#define CPG_RST_11			(CPG_BASE + 0x092C)
-#define CPG_RSTMON_5		(CPG_BASE + 0x0A14)
-#define CPG_RST_USB_V2H		(CPG_BASE + 0x0928)
-#define CPG_RSTMON4_USB		(CPG_BASE + 0x0A10)
-#define CPG_RSTMON5_USB		(CPG_BASE + 0x0A14)
-#define CPG_CLKON_USB_V2H	(CPG_BASE + 0x062C)
-#define CPG_CLKMON_USB		(CPG_BASE + 0x0814)
-#define CPG_CLKON_9			(CPG_BASE + 0x0624)
-#define CPG_RST_9			(CPG_BASE + 0x0924)
-#define CPG_RST_10			(CPG_BASE + 0x0928)
+#define CPG_BASE				0x10420000
+#define CPG_SSEL0				(CPG_BASE + 0x0300)
+#define CPG_SSEL1				(CPG_BASE + 0x0304)
+#define CPG_CLKON_11			(CPG_BASE + 0x062C)
+#define CPG_CLKON_12			(CPG_BASE + 0x0630)
+#define CPG_CLKMON_5			(CPG_BASE + 0x0814)
+#define CPG_CLKMON_6			(CPG_BASE + 0x0818)
+#define CPG_RST_11				(CPG_BASE + 0x092C)
+#define CPG_RSTMON_5			(CPG_BASE + 0x0A14)
+#define CPG_RST_USB_RZV2H		(CPG_BASE + 0x0928)
+#define CPG_RSTMON4_USB			(CPG_BASE + 0x0A10)
+#define CPG_RSTMON5_USB			(CPG_BASE + 0x0A14)
+#define CPG_CLKON_USB_RZV2H		(CPG_BASE + 0x062C)
+#define CPG_CLKMON_USB			(CPG_BASE + 0x0814)
+#define CPG_CLKON_9				(CPG_BASE + 0x0624)
+#define CPG_RST_9				(CPG_BASE + 0x0924)
+#define CPG_RST_10				(CPG_BASE + 0x0928)
 
-#define PFC_OEN				(PFC_BASE + 0x3C40)
-#define PFC_OEN_OEN0		BIT(0)
-#define PFC_OEN_OEN1		BIT(1)
-#define PFC_PWPR			(PFC_BASE + 0x3C04)
+#define PFC_OEN					(PFC_BASE + 0x3C40)
+#define PFC_OEN_OEN0			BIT(0)
+#define PFC_OEN_OEN1			BIT(1)
+#define PFC_PWPR				(PFC_BASE + 0x3C04)
 
-#define ICU_IPTSR_REG		0x10400060
+#define ICU_IPTSR_REG			0x10400060
 
 /* USB */
-#define USBPHY20_BASE		(0x15830000)
-#define USBPHY21_BASE		(0x15840000)
-#define USBPHY20_RESET		(USBPHY20_BASE + 0x000u)
-#define USBPHY21_RESET		(USBPHY21_BASE + 0x000u)
+#define USBPHY20_BASE			(0x15830000)
+#define USBPHY21_BASE			(0x15840000)
+#define USBPHY20_RESET			(USBPHY20_BASE + 0x000u)
+#define USBPHY21_RESET			(USBPHY21_BASE + 0x000u)
 
-#define USB20_BASE			(0x15800000)
-#define USB21_BASE			(0x15810000)
-#define USBF_BASE			(0x15820000)
+#define USB20_BASE				(0x15800000)
+#define USB21_BASE				(0x15810000)
+#define USBF_BASE				(0x15820000)
 
-#define USB2_PHY_UTMICTRL2	0xb04
-#define USB2_PHY_RESET		0x000
-#define USB2_PHY_OTGR		0x600
+#define USB2_PHY_UTMICTRL2		0xb04
+#define USB2_PHY_RESET			0x000
+#define USB2_PHY_OTGR			0x600
 
-#define SYS_ADC_CFG			0x10431600
+#define SYS_ADC_CFG				0x10431600
 
 /* L SERIES definition */
 
-#define MAC_ADDR_EEPROM_LOC	0xa0
+#define MAC_ADDR_EEPROM_LOC		0xa0
 
 /* CPG */			
 #define CPG_BASE_L_SERIES				0x11010000
@@ -165,13 +165,13 @@ int board_fit_config_name_match(const char *name)
 		return 0;
 
 	if ((board_id == BOARD_ID_RZG2L_SBC) &&
-		!strcmp(name, "rzpi"))
+		!strcmp(name, "rzg2l-sbc"))
 		return 0;
 
 	return -EINVAL;
 }
 
-void s_init_v2h(void)
+void s_init_rzv2h(void)
 {
 	*(volatile u32 *)PWPR |= (PWPR_REGWE_A | PWPR_REGWE_B);
 
@@ -277,7 +277,7 @@ void s_init_rzv2l()
 	*(volatile u32 *)(RPC_CMNCR) = 0x01FFF300;
 }
 
-void s_init_rzpi()
+void s_init_rzg2l_sbc()
 {
 	/* can go in board_eht_init() once enabled */
 	*(volatile u32 *)(ETH_CH0) = (*(volatile u32 *)(ETH_CH0) & 0xFFFFFFFC) | ETH_PVDD_1800;
@@ -304,9 +304,9 @@ void s_init_rzg2l()
 void s_init(void)
 {
 	if (board_id == BOARD_ID_RZV2H_EVK) {
-		s_init_v2h();
+		s_init_rzv2h();
 	} else if (board_id == BOARD_ID_RZG2L_SBC) {
-		s_init_rzpi();
+		s_init_rzg2l_sbc();
 	} else if (board_id == BOARD_ID_RZV2L_EVK || board_id == BOARD_ID_RZG2L_EVK) {
 		s_init_rzv2l();
 	} else {
@@ -346,11 +346,11 @@ static void _usbphy_init(void)
 static void _reset_usb2(void)
 {
 	/* Reset for USBTEST */
-	(*(volatile u32 *)CPG_RST_USB_V2H) |= 0x80008000;
+	(*(volatile u32 *)CPG_RST_USB_RZV2H) |= 0x80008000;
 	while((*(volatile u32 *)(CPG_RSTMON5_USB) & 0x00000001) != 0x0);
 
 	/* Reset for USB2 host 0 and 1 */
-	(*(volatile u32 *)CPG_RST_USB_V2H) |= 0x30003000;
+	(*(volatile u32 *)CPG_RST_USB_RZV2H) |= 0x30003000;
 	while((*(volatile u32 *)(CPG_RSTMON4_USB) & 0x60000000) != 0x0);
 }
 
@@ -360,7 +360,7 @@ static void board_usb_init_rzv2h(void)
 	_reset_usb2();
 
 	/* Enable clock for USB */
-	(*(volatile u32 *)CPG_CLKON_USB_V2H) = 0x00F800F8;
+	(*(volatile u32 *)CPG_CLKON_USB_RZV2H) = 0x00F800F8;
 	while((*(volatile u32 *)(CPG_CLKMON_USB) & 0x00F80000) != 0x00F80000);
 
 	/* Setup  */
