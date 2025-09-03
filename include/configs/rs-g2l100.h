@@ -81,9 +81,9 @@
 #ifndef CONFIG_CMD_IMPORTENV
 #define CONFIG_CMD_IMPORTENV
 #endif
-#define RZG2L_100_UENV_FDTO_SUPPORT
+#define RS_G2L100_UENV_FDTO_SUPPORT
 
-#ifndef RZG2L_100_UENV_FDTO_SUPPORT
+#ifndef RS_G2L100_UENV_FDTO_SUPPORT
 
 #define CONFIG_EXTRA_ENV_SETTINGS \
 	"bootm_size=0x10000000 \0" \
@@ -103,7 +103,7 @@
 #define CONFIG_EXTRA_ENV_SETTINGS \
 	"fdtfile=uEnv.txt\0" \
 	"image=Image \0" \
-	"mmcdev=0\0" \
+	"mmcdev=1\0" \
 	"mmcpart=1\0" \
 	"dtb_addr=0x48000000 \0" \
 	"dtbo_addr=0x48010000\0" \
