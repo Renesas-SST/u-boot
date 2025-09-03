@@ -58,6 +58,9 @@ ENTRY(lowlevel_init)
 	cmp w11, #BOARD_ID_RZG2L_SBC
 	b.eq set_gic_base_v2l
 
+	cmp w11, #BOARD_ID_RS_G2L100
+	b.eq set_gic_base_v2l
+
 	cmp w11, #BOARD_ID_RZG2L_EVK
 	b.eq set_gic_base_v2l
 

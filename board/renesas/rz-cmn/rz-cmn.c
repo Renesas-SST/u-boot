@@ -164,6 +164,9 @@ void setup_board_id_at_runtime(void) {
 		case BOARD_ID_RZG2L_SBC:
 			env_set("board_id", "rzg2l-sbc");
 			break;
+		case BOARD_ID_RS_G2L100:
+			env_set("board_id", "rs-g2l100");
+			break;
 		default:
 			printf("Runtime: board_id not set for board_id = %llu\n", board_id);
 			break;
@@ -186,6 +189,10 @@ int board_fit_config_name_match(const char *name)
 
 	if ((board_id == BOARD_ID_RZG2L_SBC) &&
 		!strcmp(name, "rzg2l-sbc"))
+		return 0;
+
+	if ((board_id == BOARD_ID_RS_G2L100) &&
+		!strcmp(name, "rs-g2l100"))
 		return 0;
 
 	return -EINVAL;
@@ -327,7 +334,7 @@ void s_init(void)
 		s_init_rzv2h();
 	} else if (board_id == BOARD_ID_RZG2L_SBC) {
 		s_init_rzg2l_sbc();
-	} else if (board_id == BOARD_ID_RZV2L_EVK || board_id == BOARD_ID_RZG2L_EVK) {
+	} else if (board_id == BOARD_ID_RZV2L_EVK || board_id == BOARD_ID_RZG2L_EVK || BOARD_ID_RS_G2L100) {
 		s_init_rzv2l();
 	} else {
 		return;
@@ -548,7 +555,7 @@ int board_init(void)
 	/* adress of boot parameters */
 	gd->bd->bi_boot_params = CONFIG_SYS_TEXT_BASE + 0x50000;
 
-	if(board_id == BOARD_ID_RZV2L_EVK || board_id == BOARD_ID_RZG2L_EVK)
+	if(board_id == BOARD_ID_RZV2L_EVK || board_id == BOARD_ID_RZG2L_EVK || board_id == BOARD_ID_RS_G2L100)
 	{
 		board_usb_init_rzv2l();
 	} else if (board_id == BOARD_ID_RZV2H_EVK)

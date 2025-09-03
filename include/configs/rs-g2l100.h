@@ -1,27 +1,37 @@
 /* SPDX-License-Identifier: GPL-2.0+ */
 /*
- * Copyright (C) 2022 Renesas Electronics Corporation
+ * Copyright (C) 2015 Renesas Electronics Corporation
  */
 
-#ifndef __RZ_CMN_H
-#define __RZ_CMN_H
+#ifndef __RS_G2L100_H
+#define __RS_G2L100_H
 
 #include <asm/arch/rmobile.h>
+
+//Set the correct memory of the board
+#define ISSI_4Gb_DDR 0
+#define ISSI_8Gb_DDR 1
+
+
+// Total DDR size 
+#if (ISSI_4Gb_DDR)
+#define DDR_TOTAL_SIZE    0x20000000  
+#elif (ISSI_8Gb_DDR)
+#define DDR_TOTAL_SIZE    0x40000000  
+#else
+#  error Missing memory side/type define
+#endif
+
+#define DDR_BASE_ADDR    0x48000000
+// 128MB is reserved for secure area and 128MB is reserved for ECC memory 
+#define DDR_RESERVED_SIZE 0x10000000  // 256MB reserved (128MB secure + 128MB ECC)
+#define DDR_AVAILABLE_SIZE (DDR_TOTAL_SIZE - DDR_RESERVED_SIZE)
 
 #define CONFIG_REMAKE_ELF
 
 #ifdef CONFIG_SPL
 #define CONFIG_SPL_TARGET	"spl/u-boot-spl.scif"
 #endif
-
-/* RZ board id defines, it will be used to compare with the parameter
- * passed by ATF to decide how to configure U-Boot
- */
-#define BOARD_ID_RZG2L_EVK				0x10
-#define BOARD_ID_RZG2L_SBC				0x11
-#define BOARD_ID_RZV2L_EVK				0x20
-#define BOARD_ID_RZV2H_EVK				0x30
-#define BOARD_ID_RS_G2L100				0x40
 
 /* boot option */
 
@@ -30,13 +40,10 @@
 #define CONFIG_INITRD_TAG
 
 /* Generic Interrupt Controller Definitions */
-/* RZ/V2H, V2L, G2L, RZG2L-SBC and RS-G2L100 use GIC-v3 */
+/* RZ/G2L use GIC-v3 */
 #define CONFIG_GICV3
-
-#define GICD_BASE_RZV2H		0x14900000
-#define GICR_BASE_RZV2H		0x14940000
-#define GICD_BASE_RZV2L		0x11900000
-#define GICR_BASE_RZV2L		0x11940000
+#define GICD_BASE	0x11900000
+#define GICR_BASE	0x11960000
 
 /* console */
 #define CONFIG_SYS_CBSIZE		2048
@@ -55,7 +62,7 @@
 
 #define DRAM_RSV_SIZE			0x08000000
 #define CONFIG_SYS_SDRAM_BASE		(0x40000000 + DRAM_RSV_SIZE)
-#define CONFIG_SYS_SDRAM_SIZE		(0x200000000u - DRAM_RSV_SIZE) //total 8GB
+#define CONFIG_SYS_SDRAM_SIZE		(0x80000000u - DRAM_RSV_SIZE) //total 2GB
 #define CONFIG_SYS_LOAD_ADDR		0x58000000
 #define CONFIG_LOADADDR			CONFIG_SYS_LOAD_ADDR // Default load address for tfpt,bootp...
 #define CONFIG_VERY_BIG_RAM
@@ -70,6 +77,29 @@
 #define CONFIG_BOARD_SIZE_LIMIT		1048576
 
 /* ENV setting */
+/* Support uEnv.txt to pass environment variables (and device tree overlays) to the kernel */
+#ifndef CONFIG_CMD_IMPORTENV
+#define CONFIG_CMD_IMPORTENV
+#endif
+#define RZG2L_100_UENV_FDTO_SUPPORT
+
+#ifndef RZG2L_100_UENV_FDTO_SUPPORT
+
+#define CONFIG_EXTRA_ENV_SETTINGS \
+	"bootm_size=0x10000000 \0" \
+	"prodsdbootargs=setenv bootargs rw rootwait earlycon root=/dev/mmcblk0p2\0" \
+	"bootimage=booti 0x48080000 - 0x48000000\0" \
+	"bootcmd_load=ext4load mmc 0:2 0x48080000 boot/Image;ext4load mmc 0:2 0x48000000 boot/rzg2l-sbc.dtb;run prodsdbootargs\0" \
+	"fiperase=sf erase 1d000 b0000\0" \
+	"fipload=mmc rescan;sf probe; fatload mmc 0:1 $loadaddr fip.bin\0" \
+	"fipwrite=sf write $loadaddr 1d200 $filesize\0" \
+	"ethrotate=no\0" \
+	"ethact=ethernet@11c30000\0" /* The short connector. */
+
+#define CONFIG_BOOTCOMMAND	"run bootcmd_load;run bootimage"
+
+#else
+
 #define CONFIG_EXTRA_ENV_SETTINGS \
 	"fdtfile=uEnv.txt\0" \
 	"image=Image \0" \
@@ -94,8 +124,10 @@
 
 #define CONFIG_BOOTCOMMAND	"run envboot;run prodsdboot"
 
+#endif
+
 /* For board */
 /* Ethernet RAVB */
 #define CONFIG_BITBANGMII_MULTI
 
-#endif /* __RZ_CMN_H */
+#endif /* __RS_G2L100_H */
