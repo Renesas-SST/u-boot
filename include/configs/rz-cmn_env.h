@@ -72,9 +72,11 @@
 	RZ_OVERLAY_IF_FLAG("enable_overlay_audio_codec",  "${model_string}-${revision_major}.${revision_minor}-audio-codec.dtbo") \
 	RZ_OVERLAY_IF_FLAG("enable_overlay_csi_ov5640",   "${model_string}-${revision_major}.${revision_minor}-ov5640.dtbo") \
 	RZ_OVERLAY_IF_FLAG("enable_overlay_csi_ov5645",   "${model_string}-${revision_major}.${revision_minor}-cru-csi-ov5645.dtbo") \
+	RZ_OVERLAY_IF_FLAG("enable_overlay_csi22_ar1335",  "${model_string}-${revision_major}.${revision_minor}-cru-csi22-ar1335.dtbo") \
+	RZ_OVERLAY_IF_FLAG("enable_overlay_csi23_ar1335",  "${model_string}-${revision_major}.${revision_minor}-cru-csi23-ar1335.dtbo") \
 	RZ_OVERLAY_IF_FLAG("enable_overlay_csi_j1_imx219",   "${model_string}-${revision_major}.${revision_minor}-cru-csi-j1-imx219.dtbo") \
 	RZ_OVERLAY_IF_FLAG("enable_overlay_csi_j2_imx219",   "${model_string}-${revision_major}.${revision_minor}-cru-csi-j2-imx219.dtbo") \
-	RZ_OVERLAY_IF_FLAG("enable_overlay_uio",   "${model_string}-${revision_major}.${revision_minor}-uio.dtbo")
+	RZ_OVERLAY_IF_FLAG("enable_overlay_uio",   "${model_string}-${revision_major}.${revision_minor}-uio.dtbo") \
 #endif
 
 /* Image selection cases */
