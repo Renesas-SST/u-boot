@@ -10,6 +10,27 @@
 #ifndef __RZ_CMN_ENV_H__
 #define __RZ_CMN_ENV_H__
 
+/* OpenCVA firmware load support (V2H only) */
+#define RZ_OPENCVA_ADDR        "0xC0000000"
+#define RZ_OPENCVA_FILE        "OpenCV_Bin.bin"
+
+/* Load OpenCVA firmware to reserved memory */
+#define RZ_OPENCVA_LOAD_CMD \
+		"echo Loading OpenCVA firmware: " RZ_OPENCVA_FILE " -> " RZ_OPENCVA_ADDR "; " \
+		"if ext4load mmc ${rootfs_mmcdev}:${rootfs_mmcpart} " RZ_OPENCVA_ADDR " boot/"RZ_OPENCVA_FILE "; then " \
+				"echo OpenCVA firmware loaded.; " \
+		"else " \
+				"echo WARN: missing OpenCVA firmware: " RZ_OPENCVA_FILE "; " \
+		"fi; "
+
+/* Load OpenCVA firmware only on V2H boards */
+#define RZ_OPENCVA_LOAD_IF_V2H \
+		"if test \"${model_string}\" = \"imdt-v2h-sbc\" -o " \
+				"\"${model_string}\" = \"rzv2h-evk\" -o " \
+				"\"${model_string}\" = \"rzv2h-rdk\"; then " \
+				RZ_OPENCVA_LOAD_CMD \
+		"fi; "
+
 /* Apply a single overlay by filename (relative to ${overlaydir}) */
 #define RZ_OVERLAY_APPLY_ONE(dtbo_name) \
 	"echo Applying DT overlay: " dtbo_name "; " \
@@ -81,15 +102,15 @@
 
 /* Image selection cases */
 #define RZ_IMAGE_SELECT_BEGIN \
-        "if test -z \"${image_flavor}\" || test \"${image_flavor}\" = \"normal\"; then " \
-                "setenv kernel_image Image; "
+		"if test -z \"${image_flavor}\" || test \"${image_flavor}\" = \"normal\"; then " \
+				"setenv kernel_image Image; "
 
 #define RZ_IMAGE_SELECT_END \
-        "else " \
-                "echo WARN: unknown image_flavor=${image_flavor}, fallback to normal; " \
-                "setenv image_flavor normal; " \
-                "setenv kernel_image Image; " \
-        "fi; \0"
+		"else " \
+				"echo WARN: unknown image_flavor=${image_flavor}, fallback to normal; " \
+				"setenv image_flavor normal; " \
+				"setenv kernel_image Image; " \
+		"fi; \0"
 
 #define RZ_IMAGE_CASE(image_flavor, kernel_image) \
 	"elif test \"${image_flavor}\" = \"" image_flavor "\"; then " \
@@ -122,9 +143,11 @@
 			RZ_OVERLAY_APPLY_LIST \
 			"if env exists overlay_user_cases; then run overlay_user_cases; fi; " \
 		"else echo WARN: Cannot load base DT; fi; \0" \
+	"opencva_load=" RZ_OPENCVA_LOAD_IF_V2H "\0" \
 	"mmc_do_boot=run mmc_args; run image_select; " \
 		"fatload mmc ${mmcdev}:${mmcpart} ${image_addr} ${kernel_image}; " \
 		"run fdt_ovrun; " \
+		"run opencva_load; " \
 		"booti ${image_addr} - ${dtb_addr}\0"
 
 #endif /* __RZ_CMN_ENV_H__ */
