@@ -68,7 +68,7 @@ CONFIG_ENV_IS_IN_SPI_FLASH=y
 CONFIG_ENV_SECT_SIZE=0x40000
 CONFIG_ENV_SIZE=0x40000
 CONFIG_ENV_SOURCE_FILE="sparrowhawk"
-CONFIG_DEFAULT_DEVICE_TREE="renesas/r8a779g3-sparrow-hawk"
+CONFIG_DEFAULT_DEVICE_TREE="renesas/sparrow-hawk"
 CONFIG_TARGET_SPARROWHAWK=y
 CONFIG_SYS_BOOT_GET_CMDLINE=y
 CONFIG_SYS_CLK_FREQ=16666666
@@ -79,7 +79,7 @@ CONFIG_BINMAN=y
 CONFIG_BOOTARGS="rw rootwait earlycon root=/dev/mmcblk1p2"
 # CONFIG_USE_BOOTCOMMAND is not set
 CONFIG_USE_PREBOOT=y
-CONFIG_DEFAULT_FDT_FILE="r8a779g3-sparrow-hawk.dtb"
+CONFIG_DEFAULT_FDT_FILE="sparrow-hawk.dtb"
 CONFIG_CMD_NFS=y
 CONFIG_CMD_REMOTEPROC=y
 CONFIG_GPIO_HOG=y
@@ -157,7 +157,7 @@ CONFIG_BOARD_LATE_INIT=y
 CONFIG_SPL_MAX_SIZE=0x80000
 CONFIG_SPL_I2C=y
 CONFIG_CMD_USB_MASS_STORAGE=y
-CONFIG_OF_LIST="renesas/r8a779g3-sparrow-hawk renesas/smarc-rzv2l renesas/rzg2l-sbc renesas/smarc-rzg2l renesas/rzv2h-evk-ver1 renesas/rzv2h-rdk-ver1 renesas/imdt-v2h-sbc renesas/rs-g2l100"
+CONFIG_OF_LIST="renesas/sparrow-hawk renesas/smarc-rzv2l renesas/rzg2l-sbc renesas/smarc-rzg2l renesas/rzv2h-evk-ver1 renesas/rzv2h-rdk-ver1 renesas/imdt-v2h-sbc renesas/rs-g2l100"
 CONFIG_ENV_OVERWRITE=y
 CONFIG_USB_FUNCTION_FASTBOOT=y
 CONFIG_UDP_FUNCTION_FASTBOOT=y
