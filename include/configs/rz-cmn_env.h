@@ -97,8 +97,38 @@
 	RZ_OVERLAY_IF_FLAG("enable_overlay_csi23_ar1335",  "${model_string}-${revision_major}.${revision_minor}-cru-csi23-ar1335.dtbo") \
 	RZ_OVERLAY_IF_FLAG("enable_overlay_csi_j1_imx219",   "${model_string}-${revision_major}.${revision_minor}-cru-csi-j1-imx219.dtbo") \
 	RZ_OVERLAY_IF_FLAG("enable_overlay_csi_j2_imx219",   "${model_string}-${revision_major}.${revision_minor}-cru-csi-j2-imx219.dtbo") \
-	RZ_OVERLAY_IF_FLAG("enable_overlay_uio",   "${model_string}-${revision_major}.${revision_minor}-uio.dtbo") \
+	RZ_OVERLAY_IF_FLAG("enable_overlay_uio",   "${model_string}-${revision_major}.${revision_minor}-uio.dtbo")
 #endif
+
+/* Sparrow-Hawk V4H direct OP-TEE secure-monitor handoff (partition 1) */
+#define RCAR_V4H_BL31_ADDR       "0x46400000"
+#define RCAR_V4H_BL31_FILE       "bl31-sparrow-hawk.bin"
+#define RCAR_V4H_TEE_ADDR        "0x44100000"
+#define RCAR_V4H_TEE_FILE        "tee-raw-sparrow-hawk.bin"
+
+/* Load the fixed BL31/TEE payloads, then hand off to TF-A */
+#define RCAR_V4H_BL31_PREPARE_CMD \
+		"if tfa_status; then " \
+			"echo Using active TF-A handoff; " \
+		"elif fatload mmc ${mmcdev}:${mmcpart} " RCAR_V4H_BL31_ADDR " " \
+				RCAR_V4H_BL31_FILE " && " \
+			"setexpr v4h_bl31_size ${filesize} && " \
+			"fatload mmc ${mmcdev}:${mmcpart} " RCAR_V4H_TEE_ADDR " " \
+				RCAR_V4H_TEE_FILE "; then " \
+			"tfa_prepare " RCAR_V4H_BL31_ADDR " ${v4h_bl31_size} " \
+					RCAR_V4H_TEE_ADDR " ${filesize}; " \
+		"else " \
+			"echo ERROR: missing Sparrow-Hawk BL31/TEE payload; " \
+			"test 1 = 0; " \
+		"fi; "
+
+/* Prepare TF-A handoff only on Sparrow-Hawk, boot normally otherwise */
+#define RCAR_V4H_BL31_PREPARE_IF_SPARROWHAWK \
+		"if test \"${model_string}\" = \"sparrow-hawk\"; then " \
+			RCAR_V4H_BL31_PREPARE_CMD \
+		"else " \
+			"test 0 = 0; " \
+		"fi; "
 
 /* Image selection cases */
 #define RZ_IMAGE_SELECT_BEGIN \
@@ -122,6 +152,13 @@
 
 #define RZ_ENV_DEFAULTS \
 	"overlaydir=dtb/renesas/overlays\0" \
+	"v4h_bl31_prepare=" RCAR_V4H_BL31_PREPARE_IF_SPARROWHAWK "\0" \
+	"v4h_bl31_boot=" \
+		"if run v4h_bl31_prepare; then " \
+			"booti ${image_addr} - ${dtb_addr}; " \
+		"else " \
+			"echo ERROR: secure monitor is required for Sparrow-Hawk SMP; " \
+		"fi; \0" \
 	"image_select=" \
 		RZ_IMAGE_SELECT_BEGIN \
 		RZ_IMAGE_SELECT_TABLE \
@@ -148,6 +185,10 @@
 		"fatload mmc ${mmcdev}:${mmcpart} ${image_addr} ${kernel_image}; " \
 		"run fdt_ovrun; " \
 		"run opencva_load; " \
-		"booti ${image_addr} - ${dtb_addr}\0"
+		"if test \"${model_string}\" = \"sparrow-hawk\"; then " \
+			"run v4h_bl31_boot; " \
+		"else " \
+			"booti ${image_addr} - ${dtb_addr}; " \
+		"fi\0"
 
 #endif /* __RZ_CMN_ENV_H__ */

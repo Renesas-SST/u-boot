@@ -75,8 +75,8 @@ void spl_board_id_setup(void)
 		board_id = 0;
 }
 
-#ifndef CFG_SPL_PLATFORM_SETTINGS_OFFSET
-#define CFG_SPL_PLATFORM_SETTINGS_OFFSET	0
+#ifndef RCAR_V4H_SPL_PLATFORM_SETTINGS_OFFSET
+#define RCAR_V4H_SPL_PLATFORM_SETTINGS_OFFSET	0
 #endif
 
 static const u8 sf_ids_evta1[6] = { 0x01, 0x02, 0x20, 0x4d, 0x00, 0x81 };
@@ -89,7 +89,7 @@ static void read_platform_settings(struct spi_flash *flash)
 	if (soc_id != RZ_SOC_RCAR_V4H)
 		return;
 
-	ret = spi_flash_read(flash, CFG_SPL_PLATFORM_SETTINGS_OFFSET,
+	ret = spi_flash_read(flash, RCAR_V4H_SPL_PLATFORM_SETTINGS_OFFSET,
 			     sizeof(pdesc), &pdesc);
 	if (ret) {
 		printf("SPL: failed to read platform-settings: %d\n", ret);
