@@ -37,7 +37,7 @@ static void read_platform_settings(struct spi_flash *flash)
 	platform_desc_t pdesc;
 	int ret;
 
-	ret = spi_flash_read(flash, CFG_SPL_PLATFORM_SETTINGS_OFFSET,
+	ret = spi_flash_read(flash, RCAR_V4H_SPL_PLATFORM_SETTINGS_OFFSET,
 			     sizeof(pdesc), &pdesc);
 	if (ret) {
 		printf("SPL: failed to read platform-settings: %d\n", ret);

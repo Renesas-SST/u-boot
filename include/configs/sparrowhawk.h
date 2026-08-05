@@ -11,7 +11,7 @@
 
 #include "rcar-gen4-common.h"
 
-/* Platform settings stored in SPI flash at offset 0x400000 */
-#define CFG_SPL_PLATFORM_SETTINGS_OFFSET	0x400000
+/* Sparrow-Hawk BID/platform settings are stored at xSPI offset 0x2c0000. */
+#define RCAR_V4H_SPL_PLATFORM_SETTINGS_OFFSET	0x2C0000
 
 #endif /* __SPARROWHAWK_H */

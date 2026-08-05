@@ -362,7 +362,8 @@ boot_mode_t sys_get_boot_mode(void)
  * Populate common U-Boot environment variables from the provided
  * platform descriptor structure. This includes variables such as
  * model_string, revision_minor, revision_major, mmcdev, mmcpart,
- * mmc_args, image_addr, env_addr, dtb_addr, and dtbo_addr (if applicable).
+ * rootfs_mmcdev, rootfs_mmcpart, mmc_args, image_addr, env_addr, dtb_addr,
+ * and dtbo_addr (if applicable).
  *
  */
 static void populate_env_from_board_info(const platform_desc_t *board_info)
@@ -523,18 +524,24 @@ int setup_uboot_info_from_qspi(void)
 	}
 
 	switch (soc_id) {
+		case RZ_SOC_RCAR_V4H:
+			ret = spi_flash_read(flash, RCAR_V4H_SPL_PLATFORM_SETTINGS_OFFSET,
+						sizeof(*board_info), board_info);
+			break;
 		case RZ_SOC_RZV2H:
-			ret = spi_flash_read(flash, RZV2H_XSPI_BOARD_INFO_OFFSET, CONFIG_ENV_SIZE, board_info);
+			ret = spi_flash_read(flash, RZV2H_XSPI_BOARD_INFO_OFFSET,
+						sizeof(*board_info), board_info);
 			break;
 		case RZ_SOC_RZG2L:
 		case RZ_SOC_RZV2L:
-			ret = spi_flash_read(flash, RZG2L_XSPI_BOARD_INFO_OFFSET, CONFIG_ENV_SIZE, board_info);
+			ret = spi_flash_read(flash, RZG2L_XSPI_BOARD_INFO_OFFSET,
+						sizeof(*board_info), board_info);
 			break;
 		default:
 			printf("Runtime: unknown or unsupported soc_id = %llu\n", soc_id);
 			ret = -EINVAL;
 			goto cleanup;
-	}
+		}
 
 	if (ret) {
 		printf("Failed to read SPI flash: %d\n", ret);
@@ -1136,7 +1143,7 @@ __weak int ft_board_setup(void *blob, struct bd_info *bd)
 int board_late_init(void)
 {
 	if (soc_id == RZ_SOC_RCAR_V4H)
-		return 0;
+		return setup_uboot_info_from_qspi();
 
 	if(board_id == BOARD_ID_RZG2L_SBC)
 	{
