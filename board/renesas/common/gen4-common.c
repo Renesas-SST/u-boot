@@ -70,11 +70,9 @@ struct bl2_to_bl31_params_mem {
 	struct entry_point_info	bl32_ep_info;
 };
 
-/* Default jump address, return to U-Boot */
-#define BL33_BASE	0x44100000
+#define BL31_BASE	0x46400000
 /* Custom parameters address passed to TFA by ICUMXA loader */
 #define PARAMS_BASE	0x46422200
-#define BL31_BASE	0x46400000
 #define BL31_MAX_SIZE	(PARAMS_BASE - BL31_BASE)
 #define TEE_BASE	0x44100000
 #define TEE_MAX_SIZE	(BL31_BASE - TEE_BASE)
@@ -86,20 +84,25 @@ static const struct bl2_to_bl31_params_mem blinfo_template = {
 	.bl33_ep_info.h.size = sizeof(struct entry_point_info),
 	.bl33_ep_info.h.attr = 0x81,	/* Executable | Non-Secure */
 	.bl33_ep_info.spsr = 0x2c9,	/* Mode=EL2, SP=ELX, Exceptions=OFF */
-	.bl33_ep_info.pc = BL33_BASE,
 
 	.bl33_image_info.h.type = 1,	/* PARAM_EP */
 	.bl33_image_info.h.version = 2,	/* Version 2 */
 	.bl33_image_info.h.size = sizeof(struct image_info),
 	.bl33_image_info.h.attr = 0,
-	.bl33_image_info.image_base = BL33_BASE,
 };
 
 static bool tfa_bl31_image_loaded;
 static ulong tfa_bl31_image_addr;
+static size_t tfa_bl31_image_size;
 static bool tee_image_loaded;
 static ulong tee_image_addr;
 static u32 tee_image_size;
+
+static bool addr_in_image(ulong addr, ulong image_addr, size_t image_size)
+{
+	return image_size && addr >= image_addr &&
+		addr - image_addr < image_size;
+}
 
 static void fill_bl32_info(struct bl2_to_bl31_params_mem *blinfo)
 {
@@ -135,6 +138,7 @@ static void tfa_bl31_image_process(ulong image, size_t size)
 	memset((void *)PARAMS_BASE, 0, PAGE_SIZE);
 	memcpy(blinfo, &blinfo_template, sizeof(*blinfo));
 	tfa_bl31_image_addr = image;
+	tfa_bl31_image_size = size;
 	tfa_bl31_image_loaded = true;
 }
 
@@ -178,6 +182,7 @@ static int do_tfa_prepare(struct cmd_tbl *cmdtp, int flag, int argc,
 	memset((void *)PARAMS_BASE, 0, PAGE_SIZE);
 	memcpy(blinfo, &blinfo_template, sizeof(*blinfo));
 	tfa_bl31_image_addr = bl31_addr;
+	tfa_bl31_image_size = bl31_size;
 	tfa_bl31_image_loaded = true;
 	tee_image_addr = 0;
 	tee_image_size = 0;
@@ -256,6 +261,17 @@ void armv8_switch_to_el2_prep(u64 args, u64 mach_nr, u64 fdt_addr,
 	/* If TFA BL31 was not part of the fitImage, do regular boot. */
 	if (!tfa_bl31_image_loaded)
 		return;
+
+	if (addr_in_image(ep, tfa_bl31_image_addr, tfa_bl31_image_size)) {
+		printf("TF-A handoff: BL33 entry 0x%llx overlaps BL31\n", ep);
+		return;
+	}
+
+	if (tee_image_loaded &&
+	    addr_in_image(ep, tee_image_addr, tee_image_size)) {
+		printf("TF-A handoff: BL33 entry 0x%llx overlaps BL32\n", ep);
+		return;
+	}
 
 	/*
 	 * Set up kernel entry point and parameters:
