@@ -97,6 +97,7 @@
 	RZ_OVERLAY_IF_FLAG("enable_overlay_csi23_ar1335",  "${model_string}-${revision_major}.${revision_minor}-cru-csi23-ar1335.dtbo") \
 	RZ_OVERLAY_IF_FLAG("enable_overlay_csi_j1_imx219",   "${model_string}-${revision_major}.${revision_minor}-cru-csi-j1-imx219.dtbo") \
 	RZ_OVERLAY_IF_FLAG("enable_overlay_csi_j2_imx219",   "${model_string}-${revision_major}.${revision_minor}-cru-csi-j2-imx219.dtbo") \
+	RZ_OVERLAY_IF_FLAG("enable_overlay_csi_j2_imx708",   "${model_string}-${revision_major}.${revision_minor}-cru-csi-j2-imx708.dtbo") \
 	RZ_OVERLAY_IF_FLAG("enable_overlay_uio",   "${model_string}-${revision_major}.${revision_minor}-uio.dtbo")
 #endif
 
