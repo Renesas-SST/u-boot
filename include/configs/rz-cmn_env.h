@@ -97,28 +97,24 @@
 	RZ_OVERLAY_IF_FLAG("enable_overlay_csi23_ar1335",  "${model_string}-${revision_major}.${revision_minor}-cru-csi23-ar1335.dtbo") \
 	RZ_OVERLAY_IF_FLAG("enable_overlay_csi_j1_imx219",   "${model_string}-${revision_major}.${revision_minor}-cru-csi-j1-imx219.dtbo") \
 	RZ_OVERLAY_IF_FLAG("enable_overlay_csi_j2_imx219",   "${model_string}-${revision_major}.${revision_minor}-cru-csi-j2-imx219.dtbo") \
+	RZ_OVERLAY_IF_FLAG("enable_overlay_csi_j2_imx708",   "${model_string}-${revision_major}.${revision_minor}-cru-csi-j2-imx708.dtbo") \
 	RZ_OVERLAY_IF_FLAG("enable_overlay_uio",   "${model_string}-${revision_major}.${revision_minor}-uio.dtbo")
 #endif
 
-/* Sparrow-Hawk V4H direct OP-TEE secure-monitor handoff (partition 1) */
+/* Sparrow-Hawk V4H secure-monitor handoff (partition 1) */
 #define RCAR_V4H_BL31_ADDR       "0x46400000"
 #define RCAR_V4H_BL31_FILE       "bl31-sparrow-hawk.bin"
-#define RCAR_V4H_TEE_ADDR        "0x44100000"
-#define RCAR_V4H_TEE_FILE        "tee-raw-sparrow-hawk.bin"
 
-/* Load the fixed BL31/TEE payloads, then hand off to TF-A */
+/* Load the BL31 payload without BL32/TEE, then hand off to TF-A */
 #define RCAR_V4H_BL31_PREPARE_CMD \
 		"if tfa_status; then " \
 			"echo Using active TF-A handoff; " \
 		"elif fatload mmc ${mmcdev}:${mmcpart} " RCAR_V4H_BL31_ADDR " " \
 				RCAR_V4H_BL31_FILE " && " \
-			"setexpr v4h_bl31_size ${filesize} && " \
-			"fatload mmc ${mmcdev}:${mmcpart} " RCAR_V4H_TEE_ADDR " " \
-				RCAR_V4H_TEE_FILE "; then " \
-			"tfa_prepare " RCAR_V4H_BL31_ADDR " ${v4h_bl31_size} " \
-					RCAR_V4H_TEE_ADDR " ${filesize}; " \
+			"setexpr v4h_bl31_size ${filesize}; then " \
+			"tfa_prepare " RCAR_V4H_BL31_ADDR " ${v4h_bl31_size}; " \
 		"else " \
-			"echo ERROR: missing Sparrow-Hawk BL31/TEE payload; " \
+			"echo ERROR: missing Sparrow-Hawk BL31 payload; " \
 			"test 1 = 0; " \
 		"fi; "
 
