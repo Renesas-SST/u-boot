@@ -31,6 +31,27 @@
 				RZ_OPENCVA_LOAD_CMD \
 		"fi; "
 
+/* DRP codec firmware load support (V2H only) */
+#define RZ_CODEC_ADDR          "0xC7D00000"
+#define RZ_CODEC_FILE          "Codec_Bin.bin"
+
+/* Load DRP codec firmware to reserved memory (DRP-Codec region of the device tree) */
+#define RZ_CODEC_LOAD_CMD \
+		"echo Loading Codec firmware: " RZ_CODEC_FILE " -> " RZ_CODEC_ADDR "; " \
+		"if ext4load mmc ${rootfs_mmcdev}:${rootfs_mmcpart} " RZ_CODEC_ADDR " boot/"RZ_CODEC_FILE "; then " \
+				"echo Codec firmware loaded.; " \
+		"else " \
+				"echo WARN: missing Codec firmware: " RZ_CODEC_FILE "; " \
+		"fi; "
+
+/* Load DRP codec firmware only on V2H boards */
+#define RZ_CODEC_LOAD_IF_V2H \
+		"if test \"${model_string}\" = \"imdt-v2h-sbc\" -o " \
+				"\"${model_string}\" = \"rzv2h-evk\" -o " \
+				"\"${model_string}\" = \"rzv2h-rdk\"; then " \
+				RZ_CODEC_LOAD_CMD \
+		"fi; "
+
 /* Apply a single overlay by filename (relative to ${overlaydir}) */
 #define RZ_OVERLAY_APPLY_ONE(dtbo_name) \
 	"echo Applying DT overlay: " dtbo_name "; " \
@@ -140,10 +161,12 @@
 			"if env exists overlay_user_cases; then run overlay_user_cases; fi; " \
 		"else echo WARN: Cannot load base DT; fi; \0" \
 	"opencva_load=" RZ_OPENCVA_LOAD_IF_V2H "\0" \
+	"codec_load=" RZ_CODEC_LOAD_IF_V2H "\0" \
 	"mmc_do_boot=run mmc_args; run image_select; " \
 		"fatload mmc ${mmcdev}:${mmcpart} ${image_addr} ${kernel_image}; " \
 		"run fdt_ovrun; " \
 		"run opencva_load; " \
+		"run codec_load; " \
 		"booti ${image_addr} - ${dtb_addr}\0"
 
 #endif /* __RZ_CMN_ENV_H__ */
